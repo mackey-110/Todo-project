@@ -2,10 +2,10 @@ name: DevOps Todo CI/CD Pipeline
 
 # 언제 실행할지 정의
 on:
-  push:  # 모든 브랜치의 push에서 실행
+  push: # 모든 브랜치의 push에서 실행
   pull_request:
     branches: [main]
-  workflow_dispatch:  # 수동 실행 허용
+  workflow_dispatch: # 수동 실행 허용
 
 # 환경 변수 설정
 env:
