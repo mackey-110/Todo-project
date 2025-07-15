@@ -28,6 +28,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 현재 시간 상태 추가
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   // 할 일 목록 조회
   const fetchTodos = async () => {
     try {
@@ -120,6 +123,15 @@ function App() {
     initializeData();
   }, []);
 
+  // 현재 시간 업데이트 useEffect 추가
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000); // 1초마다 업데이트
+
+    return () => clearInterval(timer); // 컴포넌트 언마운트 시 타이머 정리
+  }, []);
+
   return (
     <Box
       sx={{
@@ -166,6 +178,41 @@ function App() {
           >
             Modern Task Management with Spring Boot & React
           </Typography>
+
+          {/* 현재 시간 표시 추가 */}
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderRadius: 2,
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 500,
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+              }}
+            >
+              🕐 현재 시간:{" "}
+              {currentTime.toLocaleString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                timeZone: "Asia/Seoul",
+              })}
+            </Typography>
+          </Box>
         </Box>
 
         {/* 메인 컨테이너 */}
