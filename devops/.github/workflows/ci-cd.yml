@@ -2,8 +2,7 @@ name: DevOps Todo CI/CD Pipeline
 
 # 언제 실행할지 정의
 on:
-  push:
-    branches: [main, develop]
+  push:  # 모든 브랜치의 push에서 실행
   pull_request:
     branches: [main]
 
