@@ -31,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Java
+target/
+*.jar
+*.class
+
+# Docker
+.docker/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
