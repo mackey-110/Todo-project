@@ -5,6 +5,7 @@ on:
   push:  # 모든 브랜치의 push에서 실행
   pull_request:
     branches: [main]
+  workflow_dispatch:  # 수동 실행 허용
 
 # 환경 변수 설정
 env:
