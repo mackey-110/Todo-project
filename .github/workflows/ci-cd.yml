@@ -31,7 +31,7 @@ jobs:
       - name: Verify Docker Compose
         run: |
           docker --version
-          docker-compose --version
+          docker compose version
 
       # 3.5. 디렉토리 구조 확인 (디버깅용)
       - name: Check directory structure
@@ -56,7 +56,7 @@ jobs:
           # docker-compose.yml이 루트에 있음
           if [ -f "docker-compose.yml" ]; then
             echo "✅ Found docker-compose.yml in root directory"
-            docker-compose build --no-cache
+            docker compose build --no-cache
           else
             echo "❌ docker-compose.yml not found!"
             exit 1
@@ -66,13 +66,13 @@ jobs:
       - name: Start services and health check
         run: |
           echo "🏃‍♂️ Starting services..."
-          docker-compose up -d
+          docker compose up -d
 
           echo "⏰ Waiting for services to be ready..."
           sleep 30
 
           echo "🔍 Checking service health..."
-          docker-compose ps
+          docker compose ps
 
       # 6. 간단한 연결 테스트
       - name: Test service connectivity
@@ -88,14 +88,14 @@ jobs:
         if: failure()
         run: |
           echo "📋 Docker Compose logs:"
-          docker-compose logs
+          docker compose logs
 
       # 8. 정리
       - name: Cleanup
         if: always()
         run: |
           echo "🧹 Cleaning up..."
-          docker-compose down
+          docker compose down
           docker system prune -f
 
   # 배포 작업 (메인 브랜치에 푸시된 경우에만)
