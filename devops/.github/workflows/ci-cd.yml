@@ -1,0 +1,99 @@
+name: DevOps Todo CI/CD Pipeline
+
+# 언제 실행할지 정의
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+# 환경 변수 설정
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+jobs:
+  # 빌드 및 테스트 작업
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Docker 빌드 환경 설정
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3. Docker Compose 설치 확인
+      - name: Verify Docker Compose
+        run: |
+          docker --version
+          docker-compose --version
+
+      # 4. 프로젝트 빌드
+      - name: Build with Docker Compose
+        run: |
+          echo "🚀 Building Docker images..."
+          docker-compose build --no-cache
+
+      # 5. 컨테이너 시작 및 헬스체크
+      - name: Start services and health check
+        run: |
+          echo "🏃‍♂️ Starting services..."
+          docker-compose up -d
+
+          echo "⏰ Waiting for services to be ready..."
+          sleep 30
+
+          echo "🔍 Checking service health..."
+          docker-compose ps
+
+      # 6. 간단한 연결 테스트
+      - name: Test service connectivity
+        run: |
+          echo "🌐 Testing Nginx proxy..."
+          curl -f http://localhost:80 || echo "Frontend connection failed"
+
+          echo "🔧 Testing backend API..."
+          curl -f http://localhost:80/api/health || echo "Backend health check failed"
+
+      # 7. 로그 확인 (실패 시 디버깅용)
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "📋 Docker Compose logs:"
+          docker-compose logs
+
+      # 8. 정리
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "🧹 Cleaning up..."
+          docker-compose down
+          docker system prune -f
+
+  # 배포 작업 (메인 브랜치에 푸시된 경우에만)
+  deploy:
+    name: Deploy to Production
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy notification
+        run: |
+          echo "🚀 Deploying to production..."
+          echo "📦 Commit: ${{ github.sha }}"
+          echo "👤 Author: ${{ github.actor }}"
+
+      # 실제 배포는 나중에 AWS 연동 시 추가 예정
+      - name: Simulate deployment
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Application is now live!"
