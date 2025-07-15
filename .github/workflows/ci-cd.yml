@@ -33,16 +33,37 @@ jobs:
           docker --version
           docker-compose --version
 
+      # 3.5. 디렉토리 구조 확인 (디버깅용)
+      - name: Check directory structure
+        run: |
+          echo "📁 Current directory: $(pwd)"
+          echo "📋 Directory contents:"
+          ls -la
+          echo "🔍 Looking for devops folder:"
+          find . -name "devops" -type d 2>/dev/null || echo "devops folder not found"
+          echo "🔍 All directories:"
+          find . -type d -maxdepth 2
+
       # 4. 프로젝트 빌드
       - name: Build with Docker Compose
-        working-directory: ./devops
         run: |
           echo "🚀 Building Docker images..."
-          docker-compose build --no-cache
+          echo "📁 Current directory: $(pwd)"
+          echo "📋 Files in current directory:"
+          ls -la
+          echo "🔍 Looking for docker-compose.yml..."
+
+          # docker-compose.yml이 루트에 있음
+          if [ -f "docker-compose.yml" ]; then
+            echo "✅ Found docker-compose.yml in root directory"
+            docker-compose build --no-cache
+          else
+            echo "❌ docker-compose.yml not found!"
+            exit 1
+          fi
 
       # 5. 컨테이너 시작 및 헬스체크
       - name: Start services and health check
-        working-directory: ./devops
         run: |
           echo "🏃‍♂️ Starting services..."
           docker-compose up -d
@@ -55,7 +76,6 @@ jobs:
 
       # 6. 간단한 연결 테스트
       - name: Test service connectivity
-        working-directory: ./devops
         run: |
           echo "🌐 Testing Nginx proxy..."
           curl -f http://localhost:80 || echo "Frontend connection failed (expected in CI)"
@@ -66,7 +86,6 @@ jobs:
       # 7. 로그 확인 (실패 시 디버깅용)
       - name: Show logs on failure
         if: failure()
-        working-directory: ./devops
         run: |
           echo "📋 Docker Compose logs:"
           docker-compose logs
@@ -74,7 +93,6 @@ jobs:
       # 8. 정리
       - name: Cleanup
         if: always()
-        working-directory: ./devops
         run: |
           echo "🧹 Cleaning up..."
           docker-compose down
